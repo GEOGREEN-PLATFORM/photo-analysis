@@ -2,6 +2,7 @@ package com.example.photo_analysis.controller;
 
 import ai.onnxruntime.OrtException;
 import com.example.photo_analysis.model.PhotoDTO;
+import com.example.photo_analysis.model.ResponseDTO;
 import com.example.photo_analysis.service.AnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,8 @@ public class AnalysisController {
     @Autowired
     private AnalysisService analysisService;
 
-
-
     @PostMapping
-    public Boolean analyse(@RequestBody PhotoDTO photoDTO) throws IOException, OrtException {
+    public ResponseDTO analyse(@RequestBody PhotoDTO photoDTO) throws IOException, OrtException {
         return analysisService.analyse(photoDTO);
     }
 }

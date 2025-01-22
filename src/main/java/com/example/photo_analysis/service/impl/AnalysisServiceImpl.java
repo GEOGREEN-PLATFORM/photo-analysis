@@ -5,10 +5,12 @@ import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 import com.example.photo_analysis.model.PhotoDTO;
+import com.example.photo_analysis.model.ResponseDTO;
 import com.example.photo_analysis.service.AnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -30,11 +32,11 @@ public class AnalysisServiceImpl implements AnalysisService {
     private String modelPath;
 
     @Override
-    public Boolean analyse(PhotoDTO photo) throws OrtException, IOException {
+    @Transactional
+    public ResponseDTO analyse(PhotoDTO photo) throws OrtException, IOException {
         env = OrtEnvironment.getEnvironment();
         this.session = env.createSession(modelPath, new OrtSession.SessionOptions());
 
-        // Загрузка тестового изображения
         // TODO получение изображения от другого сервиса
         BufferedImage image = ImageIO.read(new File("src/main/resources/templates/hog.jpg"));
 
@@ -42,7 +44,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 
         close();
 
-        return result < 0.5;
+        return new ResponseDTO(result < 0.5, result);
     }
 
     private float predict(BufferedImage image) throws OrtException {
