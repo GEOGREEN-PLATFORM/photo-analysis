@@ -38,7 +38,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         this.session = env.createSession(modelPath, new OrtSession.SessionOptions());
 
         // TODO получение изображения от другого сервиса
-        BufferedImage image = ImageIO.read(new File("src/main/resources/templates/hog.jpg"));
+        BufferedImage image = ImageIO.read(new File("/app/resources/templates/hog.jpg"));
 
         float result = predict(image);
 
