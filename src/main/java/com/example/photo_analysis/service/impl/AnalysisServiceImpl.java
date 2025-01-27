@@ -4,15 +4,17 @@ import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
+import com.example.photo_analysis.exception.custom.CustomIOException;
+import com.example.photo_analysis.exception.custom.CustomOrtException;
 import com.example.photo_analysis.model.PhotoDTO;
 import com.example.photo_analysis.model.ResponseDTO;
 import com.example.photo_analysis.service.AnalysisService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -20,7 +22,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,15 +38,28 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     @Override
     @Transactional
-    public ResponseDTO analyse(PhotoDTO photo) throws OrtException, IOException {
+    public ResponseDTO analyse(PhotoDTO photo) {
         logger.debug("Создается окружение и сессия для анализа изображения с айди: {}", photo.getPhotoId());
 
-        env = OrtEnvironment.getEnvironment();
-        this.session = env.createSession(modelPath, new OrtSession.SessionOptions());
+        try {
+            env = OrtEnvironment.getEnvironment();
+            this.session = env.createSession(modelPath, new OrtSession.SessionOptions());
+        }
+        catch (OrtException e) {
+            throw new CustomOrtException(e.getMessage());
+        }
 
         logger.debug("Окружение и сессия успешно созданы для изображения с айди: {}", photo.getPhotoId());
-        // TODO получение изображения от другого сервиса
-        BufferedImage image = ImageIO.read(new File("/app/resources/templates/hog.jpg"));
+
+        BufferedImage image;
+
+        try {
+            // TODO получение изображения от другого сервиса
+            image = ImageIO.read(new File("/app/resources/templates/hog.jpg"));
+        }
+        catch (IOException e) {
+            throw new CustomIOException(e.getMessage());
+        }
 
         logger.debug("Получено изображение с айди: {}", photo.getPhotoId());
 
@@ -58,21 +72,26 @@ public class AnalysisServiceImpl implements AnalysisService {
         return new ResponseDTO(result < 0.5, result);
     }
 
-    private float predict(BufferedImage image) throws OrtException {
+    private float predict(BufferedImage image) {
         float[] inputData = preprocessImage(image);
+        float[][] output;
 
-        long[] inputShape = {1, 160, 160, 3};
-        OnnxTensor inputTensor = OnnxTensor.createTensor(env, FloatBuffer.wrap(inputData), inputShape);
+        try {
 
-        Map<String, OnnxTensor> inputs = new HashMap<>();
-        inputs.put("inputs", inputTensor);
+            long[] inputShape = {1, 160, 160, 3};
+            OnnxTensor inputTensor = OnnxTensor.createTensor(env, FloatBuffer.wrap(inputData), inputShape);
 
-        OrtSession.Result results = session.run(inputs);
+            Map<String, OnnxTensor> inputs = new HashMap<>();
+            inputs.put("inputs", inputTensor);
 
-        float[][] output = (float[][]) results.get(0).getValue();
-        inputTensor.close();
+            OrtSession.Result results = session.run(inputs);
 
-        System.out.println(Arrays.deepToString(output));
+            output = (float[][]) results.get(0).getValue();
+            inputTensor.close();
+        }
+        catch (OrtException e) {
+            throw new CustomOrtException(e.getMessage());
+        }
 
         return output[0][0];
     }
@@ -99,9 +118,14 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
 
-    private void close() throws OrtException {
-        session.close();
-        env.close();
+    private void close() {
+        try {
+            session.close();
+            env.close();
+        }
+        catch (OrtException e) {
+            throw new CustomOrtException(e.getMessage());
+        }
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.photo_analysis.exception;
 
-import ai.onnxruntime.OrtException;
+import com.example.photo_analysis.exception.custom.CustomIOException;
+import com.example.photo_analysis.exception.custom.CustomOrtException;
 import com.example.photo_analysis.model.ErrorDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.io.IOException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,21 +23,21 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler({ OrtException.class })
-    public ErrorDTO catchOrtException(OrtException e) {
+    @ExceptionHandler({ CustomOrtException.class })
+    public ErrorDTO catchOrtException(CustomOrtException e) {
         logger.error("Произошла ошибка: {}", e.getMessage(), e);
         return new ErrorDTO(
                 HttpStatus.BAD_REQUEST,
-                "Unknown error in the image recognition model: " + e.getLocalizedMessage()
+                "Unknown error in the image recognition model: " + e.getMessage()
         );
     }
 
-    @ExceptionHandler({ IOException.class })
-    public ErrorDTO catchIOException(IOException e) {
+    @ExceptionHandler({ CustomIOException.class })
+    public ErrorDTO catchIOException(CustomIOException e) {
         logger.error("Произошла ошибка: {}", e.getMessage(), e);
         return new ErrorDTO(
                 HttpStatus.BAD_REQUEST,
-                "Unknown error when working with images: " + e.getLocalizedMessage()
+                "Unknown error when working with images: " + e.getMessage()
         );
     }
 }
