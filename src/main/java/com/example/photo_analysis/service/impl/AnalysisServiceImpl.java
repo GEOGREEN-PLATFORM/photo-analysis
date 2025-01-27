@@ -8,6 +8,8 @@ import com.example.photo_analysis.model.PhotoDTO;
 import com.example.photo_analysis.model.ResponseDTO;
 import com.example.photo_analysis.service.AnalysisService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
@@ -31,16 +33,25 @@ public class AnalysisServiceImpl implements AnalysisService {
     @Value("${model.path}")
     private String modelPath;
 
+    private static final Logger logger = LoggerFactory.getLogger(AnalysisServiceImpl.class);
+
     @Override
     @Transactional
     public ResponseDTO analyse(PhotoDTO photo) throws OrtException, IOException {
+        logger.debug("Создается окружение и сессия для анализа изображения с айди: {}", photo.getPhotoId());
+
         env = OrtEnvironment.getEnvironment();
         this.session = env.createSession(modelPath, new OrtSession.SessionOptions());
 
+        logger.debug("Окружение и сессия успешно созданы для изображения с айди: {}", photo.getPhotoId());
         // TODO получение изображения от другого сервиса
         BufferedImage image = ImageIO.read(new File("/app/resources/templates/hog.jpg"));
 
+        logger.debug("Получено изображение с айди: {}", photo.getPhotoId());
+
         float result = predict(image);
+
+        logger.debug("Получено предсказание для изображения с айди: {} - {}", photo.getPhotoId(), result);
 
         close();
 
