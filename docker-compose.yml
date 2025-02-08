@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  client-backend:
+  photo-analyser:
     image: client:0.0.1
     build:
       context: .
@@ -9,3 +9,9 @@ services:
       - "8181:8181"
     environment:
       - SERVER_PORT= 8181
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true
