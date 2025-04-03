@@ -20,5 +20,5 @@ COPY --from=builder /app/target/*.jar /app/app.jar
 # Копируем ресурсы (включая модель)
 COPY ./src/main/resources /app/resources
 
-EXPOSE 8181
+#EXPOSE 8181
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
