@@ -21,4 +21,4 @@ COPY --from=builder /app/target/*.jar /app/app.jar
 COPY ./src/main/resources /app/resources
 
 #EXPOSE 8181
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-Djava.net.preferIPv4Stack=true", "-jar", "/app/app.jar"]
