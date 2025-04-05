@@ -65,7 +65,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 
         float result = predict(image);
 
-        logger.debug("Получено предсказание для изображения с айди: {} - {}", photo.getPhotoId(), result);
+        logger.info("Получено предсказание для изображения с айди: {} - {}", photo.getPhotoId(), result);
 
         close();
 
