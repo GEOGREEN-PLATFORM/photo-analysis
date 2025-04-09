@@ -6,6 +6,7 @@ import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 import com.example.photo_analysis.exception.custom.CustomIOException;
 import com.example.photo_analysis.exception.custom.CustomOrtException;
+import com.example.photo_analysis.feignClient.FeignClientService;
 import com.example.photo_analysis.model.PhotoDTO;
 import com.example.photo_analysis.model.ResponseDTO;
 import com.example.photo_analysis.service.AnalysisService;
@@ -13,17 +14,20 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +37,9 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     @Value("${model.path}")
     private String modelPath;
+
+    @Autowired
+    private final FeignClientService feignClientService;
 
     private static final Logger logger = LoggerFactory.getLogger(AnalysisServiceImpl.class);
 
@@ -55,7 +62,8 @@ public class AnalysisServiceImpl implements AnalysisService {
 
         try {
             // TODO получение изображения от другого сервиса
-            image = ImageIO.read(new File("/app/resources/templates/hog.jpg"));
+//            image = ImageIO.read(new File("/app/resources/templates/hog.jpg"));
+            image = getImageAsBufferedImage(photo.getPhotoId());
         }
         catch (IOException e) {
             throw new CustomIOException(e.getMessage());
@@ -70,6 +78,19 @@ public class AnalysisServiceImpl implements AnalysisService {
         close();
 
         return new ResponseDTO(result < 0.5, result);
+    }
+
+    private BufferedImage getImageAsBufferedImage(UUID imageId) throws IOException {
+        ResponseEntity<byte[]> response = feignClientService.analyse(imageId);
+
+        byte[] imageBytes = response.getBody();
+        if (imageBytes == null) {
+            throw new IOException("Failed to download image");
+        }
+
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes)) {
+            return ImageIO.read(bis);
+        }
     }
 
     private float predict(BufferedImage image) {
