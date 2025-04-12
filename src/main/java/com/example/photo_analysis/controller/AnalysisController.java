@@ -6,6 +6,7 @@ import com.example.photo_analysis.service.AnalysisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -16,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.example.photo_analysis.util.AuthorizationStringUtil.AUTHORIZATION;
+
 @RestController
 @RequestMapping("/analyse")
 @RequiredArgsConstructor
+@SecurityRequirement(name = AUTHORIZATION)
 @Tag(name = "Анализ фото", description = "Позволяет проанализировать фотографию на наличие борщевика")
 public class AnalysisController {
 
