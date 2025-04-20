@@ -26,8 +26,8 @@ jobs:
           cache: maven
 
       - name: Get version from pom.xml
-          id: get_version
-          run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+        id: get_version
+        run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: maven build
         run: mvn -am package
