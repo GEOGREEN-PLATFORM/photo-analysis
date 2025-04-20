@@ -14,7 +14,7 @@ import static com.example.photo_analysis.util.AuthorizationStringUtil.AUTHORIZAT
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "API микросервиса photo-analyser!",
+                title = "API микросервиса photo-analyser",
                 description = "Микросервис для анализа фото на наличие борщевика",
                 contact = @Contact(
                         name = "Егор Дементьев",
