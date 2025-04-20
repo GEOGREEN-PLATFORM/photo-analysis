@@ -28,7 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
-		<photo-analyser.version>0.1.0</photo-analyser.version>
+		<version>0.1.0</version>
 	</properties>
 	<dependencies>
 		<dependency>
