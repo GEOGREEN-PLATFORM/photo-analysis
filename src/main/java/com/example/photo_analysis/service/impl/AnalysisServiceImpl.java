@@ -4,11 +4,13 @@ import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
+import com.example.photo_analysis.consumer.dto.PhotoAnalyseInDTO;
 import com.example.photo_analysis.exception.custom.CustomIOException;
 import com.example.photo_analysis.exception.custom.CustomOrtException;
 import com.example.photo_analysis.feignClient.FeignClientService;
 import com.example.photo_analysis.model.PhotoDTO;
 import com.example.photo_analysis.model.ResponseDTO;
+import com.example.photo_analysis.producer.dto.PhotoAnalyseOutDTO;
 import com.example.photo_analysis.service.AnalysisService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -78,6 +80,12 @@ public class AnalysisServiceImpl implements AnalysisService {
         close();
 
         return new ResponseDTO(result < 0.5, result);
+    }
+
+    @Override
+    public PhotoAnalyseOutDTO analyse(PhotoAnalyseInDTO photo) {
+        ResponseDTO response = analyse(new PhotoDTO(photo.getPhotoId()));
+        return new PhotoAnalyseOutDTO(photo.getUserMarkerId(), photo.getProtoPosition(), (int) (100 - response.getPrediction() * 100));
     }
 
     private BufferedImage getImageAsBufferedImage(UUID imageId) throws IOException {
