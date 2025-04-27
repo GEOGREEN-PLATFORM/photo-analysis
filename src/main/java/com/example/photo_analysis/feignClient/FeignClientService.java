@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.UUID;
 
-@FeignClient(name="photo-analyse", url="${file.server.host}:${file.server.port}")
+@FeignClient(name="photo-analyse", url="${file.server.host}")
 public interface FeignClientService {
     @GetMapping("/file/image/download/{imageId}")
     ResponseEntity<byte[]> analyse(@PathVariable UUID imageId);

@@ -12,6 +12,14 @@ services:
     networks:
       - shared_network
 
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8082:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: true
+
 networks:
   shared_network:
     external: true
