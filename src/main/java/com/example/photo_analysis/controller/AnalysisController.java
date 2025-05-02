@@ -31,7 +31,7 @@ public class AnalysisController {
 
     private static final Logger logger = LoggerFactory.getLogger(AnalysisController.class);
 
-    @PostMapping
+    @PostMapping("/predict")
     @Operation(
             summary = "Анализ",
             description = "Позволяет проанализировать фотографию и получить вероятность наличия борщевика на фото"
