@@ -28,7 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
-		<photo-analysis.version>0.3.2</photo-analysis.version>
+		<photo-analysis.version>0.3.3</photo-analysis.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -128,6 +128,12 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>

@@ -14,6 +14,7 @@ import com.example.photo_analysis.producer.dto.PhotoAnalyseOutDTO;
 import com.example.photo_analysis.service.AnalysisService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,13 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Setter
 public class AnalysisServiceImpl implements AnalysisService {
-    private OrtEnvironment env;
-    private OrtSession session;
+    protected OrtEnvironment env;
+    protected OrtSession session;
 
     @Value("${model.path}")
-    private String modelPath;
+    protected String modelPath;
 
     @Autowired
     private final FeignClientService feignClientService;
@@ -91,7 +93,13 @@ public class AnalysisServiceImpl implements AnalysisService {
     private BufferedImage getImageAsBufferedImage(UUID imageId) throws IOException {
         ResponseEntity<byte[]> response = feignClientService.analyse(imageId);
 
-        byte[] imageBytes = response.getBody();
+        byte[] imageBytes;
+        try {
+            imageBytes = response.getBody();
+        }
+        catch (NullPointerException e) {
+            throw new CustomIOException(e.getMessage());
+        }
         if (imageBytes == null) {
             throw new IOException("Failed to download image");
         }
@@ -101,7 +109,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         }
     }
 
-    private float predict(BufferedImage image) {
+    protected float predict(BufferedImage image) {
         float[] inputData = preprocessImage(image);
         float[][] output;
 
