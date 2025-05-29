@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  photo-analyser:
+    image: client:0.0.2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8181:8181"
+    environment:
+      - SERVER_PORT= 8181
+    networks:
+      - shared_network
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8082:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: true
+
+networks:
+  shared_network:
+    external: true
